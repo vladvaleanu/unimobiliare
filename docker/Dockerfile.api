@@ -1,0 +1,71 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Unimobiliare API Dockerfile
+# Multi-stage build for production
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1: Builder
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies first (better caching)
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY packages/database/package*.json ./packages/database/
+COPY apps/api/package*.json ./apps/api/
+
+RUN npm ci --workspace=@unimobiliare/shared \
+    --workspace=@unimobiliare/database \
+    --workspace=@unimobiliare/api
+
+# Copy source code
+COPY packages/shared ./packages/shared
+COPY packages/database ./packages/database
+COPY apps/api ./apps/api
+COPY tsconfig.base.json ./
+
+# Generate Prisma client
+RUN npm run generate --workspace=@unimobiliare/database
+
+# Build all packages
+RUN npm run build --workspace=@unimobiliare/shared
+RUN npm run build --workspace=@unimobiliare/database
+RUN npm run build --workspace=@unimobiliare/api
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2: Production
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Copy built files
+COPY --from=builder --chown=nodejs:nodejs /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=nodejs:nodejs /app/packages/shared/package.json ./packages/shared/
+COPY --from=builder --chown=nodejs:nodejs /app/packages/database/dist ./packages/database/dist
+COPY --from=builder --chown=nodejs:nodejs /app/packages/database/package.json ./packages/database/
+COPY --from=builder --chown=nodejs:nodejs /app/packages/database/prisma ./packages/database/prisma
+COPY --from=builder --chown=nodejs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=builder --chown=nodejs:nodejs /app/apps/api/package.json ./apps/api/
+
+# Copy root files
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/v1/health/live || exit 1
+
+# Start application
+CMD ["node", "apps/api/dist/app.js"]

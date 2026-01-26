@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Unimobiliare Admin Panel Dockerfile
+# Multi-stage build for React app
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1: Builder
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/admin/package*.json ./apps/admin/
+
+RUN npm ci --workspace=@unimobiliare/shared \
+    --workspace=@unimobiliare/admin
+
+# Copy source code
+COPY packages/shared ./packages/shared
+COPY apps/admin ./apps/admin
+COPY tsconfig.base.json ./
+
+# Build
+RUN npm run build --workspace=@unimobiliare/shared
+RUN npm run build --workspace=@unimobiliare/admin
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2: Production with Nginx
+# ─────────────────────────────────────────────────────────────────────────────
+FROM nginx:alpine AS production
+
+# Copy built files
+COPY --from=builder /app/apps/admin/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY docker/nginx-spa.conf /etc/nginx/conf.d/default.conf
+
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
