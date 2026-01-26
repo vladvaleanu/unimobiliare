@@ -1,5 +1,5 @@
-import { PAGINATION } from '../constants/pagination.js';
-import type { PaginationMeta, PaginationParams } from '../types/api.js';
+import { PAGINATION } from '../constants/pagination';
+import type { PaginationMeta, PaginationParams } from '../types/api';
 
 /**
  * Calculate pagination offset from page number

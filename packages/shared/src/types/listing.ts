@@ -1,4 +1,4 @@
-import type { ListingStatus, TransactionType, PropertyType } from '../constants/status.js';
+import type { ListingStatus, TransactionType, PropertyType } from '../constants/status';
 
 /**
  * Location data for a listing

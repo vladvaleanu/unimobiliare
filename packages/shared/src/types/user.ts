@@ -1,5 +1,5 @@
-import type { Role } from '../constants/roles.js';
-import type { SubscriptionStatus } from '../constants/status.js';
+import type { Role } from '../constants/roles';
+import type { SubscriptionStatus } from '../constants/status';
 
 /**
  * User entity

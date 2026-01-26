@@ -1,4 +1,4 @@
-import type { SyncStatus } from '../constants/status.js';
+import type { SyncStatus } from '../constants/status';
 
 /**
  * Source configuration for an integration

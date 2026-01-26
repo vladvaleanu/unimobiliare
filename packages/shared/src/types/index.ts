@@ -4,9 +4,9 @@
  * TypeScript interfaces for all entities and API contracts.
  */
 
-export * from './user.js';
-export * from './listing.js';
-export * from './integration.js';
-export * from './subscription.js';
-export * from './audit.js';
-export * from './api.js';
+export * from './user';
+export * from './listing';
+export * from './integration';
+export * from './subscription';
+export * from './audit';
+export * from './api';
