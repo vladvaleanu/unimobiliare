@@ -13,8 +13,8 @@
         "test:coverage": "vitest --coverage"
     },
     "dependencies": {
-        "@unimobiliare/shared": "workspace:*",
-        "@unimobiliare/database": "workspace:*",
+        "@unimobiliare/shared": "*",
+        "@unimobiliare/database": "*",
         "express": "^4.18.0",
         "cors": "^2.8.5",
         "helmet": "^7.1.0",

@@ -10,7 +10,7 @@
         "lint": "eslint src/"
     },
     "dependencies": {
-        "@unimobiliare/shared": "workspace:*",
+        "@unimobiliare/shared": "*",
         "@reduxjs/toolkit": "^2.0.0",
         "@mui/material": "^5.15.0",
         "@mui/icons-material": "^5.15.0",
