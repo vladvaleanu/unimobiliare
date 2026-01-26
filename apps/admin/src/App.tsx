@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { DashboardPage } from './pages/DashboardPage';
+import { IntegrationsPage } from './pages/IntegrationsPage';
+import { UsersPage } from './pages/UsersPage';
 import { LoginPage } from './pages/LoginPage';
 import { useAppSelector } from './store/hooks';
 
@@ -20,10 +22,10 @@ function App() {
         <Routes>
             <Route path="/" element={<DashboardLayout />}>
                 <Route index element={<DashboardPage />} />
+                <Route path="integrations" element={<IntegrationsPage />} />
+                <Route path="users" element={<UsersPage />} />
                 {/* TODO: Add more routes */}
-                {/* <Route path="integrations" element={<IntegrationsPage />} /> */}
                 {/* <Route path="integrations/:id" element={<IntegrationBuilderPage />} /> */}
-                {/* <Route path="users" element={<UsersPage />} /> */}
                 {/* <Route path="plans" element={<PlansPage />} /> */}
                 {/* <Route path="ai-settings" element={<AISettingsPage />} /> */}
                 {/* <Route path="audit-log" element={<AuditLogPage />} /> */}
