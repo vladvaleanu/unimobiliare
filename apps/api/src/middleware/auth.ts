@@ -63,6 +63,43 @@ export function authenticate(
 }
 
 /**
+ * Optional authentication middleware
+ * Attaches user if token is valid, but doesn't require it
+ */
+export function optionalAuth(
+    req: Request,
+    _res: Response,
+    next: NextFunction
+): void {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader?.startsWith('Bearer ')) {
+            // No token, continue without user
+            next();
+            return;
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        if (!token) {
+            next();
+            return;
+        }
+
+        const env = getEnv();
+        const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+
+        // Attach user to request
+        (req as AuthenticatedRequest).user = decoded;
+        next();
+    } catch {
+        // Token invalid, continue without user
+        next();
+    }
+}
+
+/**
  * Authorization middleware factory
  * STRICT: Checks if user has required role
  */
@@ -85,6 +122,8 @@ export function authorize(...allowedRoles: Role[]) {
 }
 
 /**
- * Admin-only authorization shortcut
+ * Admin-only authorization shortcuts
  */
 export const adminOnly = authorize(ROLES.ADMIN);
+export const requireAdmin = authorize(ROLES.ADMIN);
+
