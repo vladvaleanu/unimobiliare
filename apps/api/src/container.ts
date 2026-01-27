@@ -8,14 +8,17 @@
 import { getPrismaClient } from '@unimobiliare/database';
 
 // Repositories
-import { UserRepository } from '../repositories/userRepository';
-import { RefreshTokenRepository } from '../repositories/refreshTokenRepository';
+import { UserRepository } from './repositories/userRepository';
+import { RefreshTokenRepository } from './repositories/refreshTokenRepository';
+import { IntegrationRepository } from './repositories/integrationRepository';
 
 // Services
-import { AuthService } from '../services/authService';
+import { AuthService } from './services/authService';
+import { IntegrationService } from './services/integrationService';
 
 // Controllers
-import { AuthController } from '../controllers/authController';
+import { AuthController } from './controllers/authController';
+import { IntegrationController } from './controllers/integrationController';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Create instances
@@ -24,11 +27,37 @@ import { AuthController } from '../controllers/authController';
 const prisma = getPrismaClient();
 
 // Repositories
-export const userRepository = new UserRepository(prisma);
-export const refreshTokenRepository = new RefreshTokenRepository(prisma);
+const userRepository = new UserRepository(prisma);
+const refreshTokenRepository = new RefreshTokenRepository(prisma);
+const integrationRepository = new IntegrationRepository(prisma);
 
 // Services
-export const authService = new AuthService(userRepository, refreshTokenRepository);
+const authService = new AuthService(userRepository, refreshTokenRepository);
+const integrationService = new IntegrationService(integrationRepository);
 
 // Controllers
-export const authController = new AuthController(authService);
+const authController = new AuthController(authService);
+const integrationController = new IntegrationController(integrationService);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Export container
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const container = {
+    // Repositories
+    userRepository,
+    refreshTokenRepository,
+    integrationRepository,
+
+    // Services
+    authService,
+    integrationService,
+
+    // Controllers
+    authController,
+    integrationController,
+};
+
+// Legacy exports for backwards compatibility
+export { authController, authService, userRepository, refreshTokenRepository };
+
