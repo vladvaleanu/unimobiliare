@@ -16,8 +16,6 @@ function App() {
             {/* Public routes with layout */}
             <Route element={<AppLayout />}>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/listing/:id" element={<ListingDetailPage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
@@ -27,6 +25,8 @@ function App() {
             {/* Protected routes with layout */}
             <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/listing/:id" element={<ListingDetailPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/saved" element={<SavedListingsPage />} />
                     <Route path="/subscription" element={<SubscriptionPage />} />

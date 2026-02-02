@@ -32,11 +32,16 @@ interface SearchFilters {
     propertyType?: string;
     transactionType?: string;
     city?: string;
+    neighborhood?: string;
     priceMin?: number;
     priceMax?: number;
     rooms?: number;
+    bathrooms?: number;
     areaMin?: number;
     areaMax?: number;
+    floor?: number;
+    yearBuilt?: number;
+    amenities?: string[];
     page?: number;
     limit?: number;
 }
@@ -54,7 +59,12 @@ export const listingService = {
 
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null && value !== '') {
-                params.append(key, value.toString());
+                if (Array.isArray(value)) {
+                    // Handle arrays (e.g., amenities)
+                    value.forEach((item) => params.append(key, item.toString()));
+                } else {
+                    params.append(key, value.toString());
+                }
             }
         });
 
