@@ -71,56 +71,74 @@ export function TestStep({
         setLoading(true);
         setResult(null);
 
-        // Simulate API call for testing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        try {
+            const startTime = Date.now();
 
-        // Mock test result
-        const mockResult: TestResult = {
-            success: true,
-            message: 'Test completed successfully',
-            itemsFound: 15,
-            sampleData: [
-                {
-                    title: 'Apartament 3 camere Floreasca',
-                    price: 185000,
-                    currency: 'EUR',
-                    areaSqm: 85,
-                    rooms: 3,
-                    'location.city': 'București',
-                    'location.neighborhood': 'Floreasca',
-                    externalId: 'ext-123456',
-                },
-                {
-                    title: 'Garsonieră Militari',
-                    price: 45000,
-                    currency: 'EUR',
-                    areaSqm: 32,
-                    rooms: 1,
-                    'location.city': 'București',
-                    'location.neighborhood': 'Militari',
-                    externalId: 'ext-789012',
-                },
-                {
-                    title: 'Casă cu grădină Pipera',
-                    price: 350000,
-                    currency: 'EUR',
-                    areaSqm: 250,
-                    rooms: 5,
-                    'location.city': 'București',
-                    'location.neighborhood': 'Pipera',
-                    externalId: 'ext-345678',
-                },
-            ],
-            rawHtml: `<div class="listing-item">
-  <h3><a href="/listing/123">Apartament 3 camere</a></h3>
-  <span class="price">185.000 EUR</span>
-  <span class="area">85 mp</span>
-</div>`,
-            errors: [],
-            duration: 1847,
-        };
+            // Convert fieldMappings to the format expected by the API
+            const apiMappings = fieldMappings.map(m => ({
+                field: m.field,
+                selector: m.selector,
+                attribute: m.attribute || 'text',
+                multiple: m.field === 'images',
+                transforms: m.transforms?.map(t => ({
+                    type: t.type,
+                    options: t.params
+                }))
+            }));
 
-        setResult(mockResult);
+            const response = await fetch('/api/v1/integrations/builder/preview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify({
+                    url: testUrl,
+                    fieldMappings: apiMappings
+                })
+            });
+
+            const data = await response.json();
+            const duration = Date.now() - startTime;
+
+            if (data.success && data.data) {
+                const preview = data.data;
+                const sampleItem: Record<string, any> = {};
+
+                preview.extractions?.forEach((ext: any) => {
+                    sampleItem[ext.field] = ext.value;
+                });
+
+                setResult({
+                    success: preview.success,
+                    message: preview.success ? 'Test completed successfully' : (preview.error || 'Test failed'),
+                    itemsFound: 1,
+                    sampleData: Object.keys(sampleItem).length > 0 ? [sampleItem] : [],
+                    rawHtml: undefined,
+                    errors: preview.extractions?.filter((e: any) => e.error).map((e: any) => `${e.field}: ${e.error}`) || [],
+                    duration,
+                });
+            } else {
+                setResult({
+                    success: false,
+                    message: data.error?.message || 'Failed to run test',
+                    itemsFound: 0,
+                    sampleData: [],
+                    errors: [data.error?.message || 'Unknown error'],
+                    duration: Date.now() - startTime,
+                });
+            }
+        } catch (error: any) {
+            setResult({
+                success: false,
+                message: error.message || 'Network error',
+                itemsFound: 0,
+                sampleData: [],
+                errors: [error.message || 'Network error'],
+                duration: 0,
+            });
+        }
+
         setLoading(false);
     };
 

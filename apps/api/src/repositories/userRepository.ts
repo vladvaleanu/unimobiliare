@@ -14,13 +14,17 @@ export interface IUserRepository {
     create(data: Prisma.UserCreateInput): Promise<User>;
     update(id: string, data: Prisma.UserUpdateInput): Promise<User>;
     delete(id: string): Promise<void>;
+    softDelete(id: string): Promise<void>;
     findMany(options?: FindUsersOptions): Promise<{ users: User[]; total: number }>;
 }
 
 export interface FindUsersOptions {
     page?: number;
     limit?: number;
+    skip?: number;
+    take?: number;
     role?: string;
+    subscriptionStatus?: string;
     search?: string;
 }
 
@@ -62,6 +66,10 @@ export class UserRepository implements IUserRepository {
             where: { id },
             data: { deletedAt: new Date() },
         });
+    }
+
+    async softDelete(id: string): Promise<void> {
+        return this.delete(id);
     }
 
     async findMany(options: FindUsersOptions = {}): Promise<{ users: User[]; total: number }> {

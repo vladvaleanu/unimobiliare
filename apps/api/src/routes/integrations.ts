@@ -108,4 +108,46 @@ router.post(
     })
 );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Integration Builder Endpoints (No-Code)
+// ─────────────────────────────────────────────────────────────────────────────
+
+import * as builderController from '../controllers/integrationBuilderController';
+
+/**
+ * POST /api/v1/integrations/builder/test-selector
+ * Test a CSS selector on a URL or HTML content
+ */
+router.post(
+    '/builder/test-selector',
+    asyncHandler(builderController.testSelector)
+);
+
+/**
+ * POST /api/v1/integrations/builder/preview
+ * Preview field extractions on a URL
+ */
+router.post(
+    '/builder/preview',
+    asyncHandler(builderController.previewExtraction)
+);
+
+/**
+ * POST /api/v1/integrations/builder/fetch-page
+ * Fetch a page HTML for client-side testing
+ */
+router.post(
+    '/builder/fetch-page',
+    asyncHandler(builderController.fetchPage)
+);
+
+/**
+ * POST /api/v1/integrations/builder/batch-test
+ * Test extraction on multiple URLs (max 10)
+ */
+router.post(
+    '/builder/batch-test',
+    asyncHandler(builderController.batchTest)
+);
+
 export const integrationRoutes = router;

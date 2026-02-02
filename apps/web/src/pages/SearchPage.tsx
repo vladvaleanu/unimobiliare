@@ -43,9 +43,10 @@ export function SearchPage() {
         setLoading(false);
 
         if (response.success && response.data) {
-            setListings(response.data.listings);
-            setTotalPages(response.data.totalPages);
+            setListings(response.data.listings || []);
+            setTotalPages(response.data.totalPages || 1);
         } else {
+            setListings([]);
             setError(response.error?.message || 'Failed to load listings');
         }
     };

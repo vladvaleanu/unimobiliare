@@ -34,7 +34,14 @@ app.use(
     cors({
         origin: env.NODE_ENV === 'production'
             ? [env.APP_URL]
-            : ['http://localhost:3001', 'http://localhost:3002'],
+            : (origin, callback) => {
+                // Allow any localhost port in development
+                if (!origin || origin.startsWith('http://localhost:')) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
         credentials: true,
     })
 );

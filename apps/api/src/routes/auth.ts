@@ -36,6 +36,12 @@ router.post('/login', validate(loginSchema), authController.login);
 router.post('/refresh', validate(refreshSchema), authController.refresh);
 
 /**
+ * GET /api/v1/auth/me
+ * Get current authenticated user
+ */
+router.get('/me', authenticate, authController.getMe);
+
+/**
  * POST /api/v1/auth/logout
  * Logout and revoke refresh token
  */

@@ -67,6 +67,7 @@ export interface IAuthService {
     refresh(refreshToken: string): Promise<TokenPair>;
     logout(refreshToken: string): Promise<void>;
     logoutAllDevices(userId: string): Promise<void>;
+    getUserById(userId: string): Promise<SafeUser>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -200,6 +201,17 @@ export class AuthService implements IAuthService {
      */
     async logoutAllDevices(userId: string): Promise<void> {
         await this.refreshTokenRepository.revokeAllForUser(userId);
+    }
+
+    /**
+     * Get user by ID (for /me endpoint)
+     */
+    async getUserById(userId: string): Promise<SafeUser> {
+        const user = await this.userRepository.findById(userId);
+        if (!user || user.deletedAt) {
+            throw new NotFoundError('User not found');
+        }
+        return this.sanitizeUser(user);
     }
 
     // ─────────────────────────────────────────────────────────────────────────────

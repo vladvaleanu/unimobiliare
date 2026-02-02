@@ -5,6 +5,10 @@ import { integrationRoutes } from './integrations';
 import { planRoutes } from './plans';
 import { subscriptionRoutes } from './subscriptions';
 import { webhookRoutes } from './webhooks';
+import { listingRoutes } from './listings';
+import { userRoutes } from './users';
+import { adminRoutes } from './admin';
+import { aiRoutes } from './ai';
 
 const router = Router();
 
@@ -26,11 +30,16 @@ router.use('/subscriptions', subscriptionRoutes);
 // Webhook endpoints (external services)
 router.use('/webhooks', webhookRoutes);
 
-// TODO: Add more routes as they're implemented
-// router.use('/users', userRoutes);
-// router.use('/listings', listingRoutes);
+// Listing endpoints
+router.use('/listings', listingRoutes);
+
+// User management endpoints (admin only)
+router.use('/users', userRoutes);
+
+// Admin endpoints (stats, audit logs)
+router.use('/admin', adminRoutes);
+
+// AI Gateway endpoints
+router.use('/ai', aiRoutes);
 
 export { router as apiRoutes };
-
-
-

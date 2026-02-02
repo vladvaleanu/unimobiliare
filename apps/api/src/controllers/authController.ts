@@ -86,6 +86,24 @@ export class AuthController {
     };
 
     /**
+     * GET /api/v1/auth/me
+     * Get current authenticated user
+     */
+    getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId = (req as any).user.userId;
+            const user = await this.authService.getUserById(userId);
+
+            res.json({
+                success: true,
+                data: user,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
      * POST /api/v1/auth/logout-all
      * Requires authentication
      */

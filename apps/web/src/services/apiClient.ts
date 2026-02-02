@@ -1,3 +1,5 @@
+import { tokenStorage } from './tokenStorage';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface ApiResponse<T = unknown> {
@@ -22,13 +24,22 @@ class ApiClient {
     ): Promise<ApiResponse<T>> {
         const url = `${this.baseURL}${endpoint}`;
 
+        // Build headers with Authorization token if available
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        };
+
+        // Add Authorization header if we have a token
+        const token = tokenStorage.getAccessToken();
+        if (token) {
+            (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+        }
+
         const config: RequestInit = {
             ...options,
             credentials: 'include', // Include cookies
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
+            headers,
         };
 
         try {
@@ -36,6 +47,11 @@ class ApiClient {
             const data = await response.json();
 
             if (!response.ok) {
+                // If 401, clear tokens (session expired)
+                if (response.status === 401) {
+                    tokenStorage.clearTokens();
+                }
+
                 return {
                     success: false,
                     error: {
