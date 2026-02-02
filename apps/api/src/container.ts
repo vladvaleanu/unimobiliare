@@ -6,6 +6,10 @@
  */
 
 import { getPrismaClient } from '@unimobiliare/database';
+import { loadEnv } from './config/index.js';
+
+// Load environment variables before instantiating services
+loadEnv();
 
 // Repositories
 import { UserRepository } from './repositories/userRepository';
@@ -32,6 +36,7 @@ import { SubscriptionController } from './controllers/subscriptionController';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const prisma = getPrismaClient();
+
 
 // Repositories
 const userRepository = new UserRepository(prisma);
