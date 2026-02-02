@@ -1,20 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { SearchPage } from './pages/SearchPage';
+import { ListingDetailPage } from './pages/ListingDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { SavedListingsPage } from './pages/SavedListingsPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 
-// Placeholder pages (will create later)
-function DashboardPage() {
-    return <div style={{ padding: '2rem' }}>Dashboard - Coming Soon</div>;
-}
-
-function SavedListingsPage() {
-    return <div style={{ padding: '2rem' }}>Saved Listings - Coming Soon</div>;
-}
-
+// Placeholder page
 function SubscriptionPage() {
     return <div style={{ padding: '2rem' }}>Subscription - Coming Soon</div>;
 }
@@ -26,6 +21,7 @@ function App() {
             <Route element={<AppLayout />}>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/listing/:id" element={<ListingDetailPage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
@@ -45,3 +41,4 @@ function App() {
 }
 
 export default App;
+
