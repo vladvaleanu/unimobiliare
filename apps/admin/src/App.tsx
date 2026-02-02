@@ -4,6 +4,10 @@ import { DashboardPage } from './pages/DashboardPage';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { IntegrationBuilderPage } from './pages/IntegrationBuilderPage';
 import { UsersPage } from './pages/UsersPage';
+import { PlansPage } from './pages/PlansPage';
+import { AISettingsPage } from './pages/AISettingsPage';
+import { AuditLogPage } from './pages/AuditLogPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { useAppSelector } from './store/hooks';
 
@@ -27,11 +31,10 @@ function App() {
                 <Route path="integrations/new" element={<IntegrationBuilderPage />} />
                 <Route path="integrations/:id/edit" element={<IntegrationBuilderPage />} />
                 <Route path="users" element={<UsersPage />} />
-                {/* TODO: Add more routes */}
-                {/* <Route path="plans" element={<PlansPage />} /> */}
-                {/* <Route path="ai-settings" element={<AISettingsPage />} /> */}
-                {/* <Route path="audit-log" element={<AuditLogPage />} /> */}
-                {/* <Route path="settings" element={<SettingsPage />} /> */}
+                <Route path="plans" element={<PlansPage />} />
+                <Route path="ai-settings" element={<AISettingsPage />} />
+                <Route path="audit-log" element={<AuditLogPage />} />
+                <Route path="settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -39,3 +42,4 @@ function App() {
 }
 
 export default App;
+
