@@ -8,18 +8,24 @@
         "apps/*"
     ],
     "scripts": {
+        "dev": "concurrently -n api,admin,web -c blue,green,yellow \"npm run dev:api\" \"npm run dev:admin\" \"npm run dev:web\"",
         "dev:api": "npm run dev --workspace=apps/api",
         "dev:web": "npm run dev --workspace=apps/web",
         "dev:admin": "npm run dev --workspace=apps/admin",
+        "build:packages": "npm run build --workspace=packages/shared && npm run build --workspace=packages/database",
         "build:api": "npm run build --workspace=apps/api",
         "build:web": "npm run build --workspace=apps/web",
         "build:admin": "npm run build --workspace=apps/admin",
-        "build:all": "npm run build --workspaces",
+        "build:all": "npm run build:packages && npm run build --workspaces --if-present",
         "lint": "npm run lint --workspaces --if-present",
         "test": "npm run test --workspaces --if-present",
         "db:generate": "npm run generate --workspace=packages/database",
         "db:migrate": "npm run migrate --workspace=packages/database",
-        "db:seed": "npm run seed --workspace=packages/database"
+        "db:seed": "npm run seed --workspace=packages/database",
+        "setup": "npm install && npm run build:packages && npm run db:generate"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.0"
     },
     "engines": {
         "node": ">=20.0.0",
