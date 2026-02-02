@@ -6,13 +6,9 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SavedListingsPage } from './pages/SavedListingsPage';
+import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
-
-// Placeholder page
-function SubscriptionPage() {
-    return <div style={{ padding: '2rem' }}>Subscription - Coming Soon</div>;
-}
 
 function App() {
     return (
