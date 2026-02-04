@@ -13,6 +13,7 @@ import {
     IntegrationFindManyOptions,
 } from '../repositories/integrationRepository';
 import { NotFoundError, ConflictError, ValidationError } from '../errors';
+import { scrapingQueue } from './scrapingQueueService';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Interface
@@ -167,8 +168,8 @@ export class IntegrationService implements IIntegrationService {
         // Update status to running
         const updated = await this.integrationRepository.updateSyncStatus(id, 'running');
 
-        // TODO: Queue sync job to BullMQ worker
-        // await this.syncQueue.add('sync-integration', { integrationId: id });
+        // Queue sync job to BullMQ worker
+        await scrapingQueue.addFullSyncJob(id);
 
         return updated;
     }

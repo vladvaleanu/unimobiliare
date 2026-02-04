@@ -29,7 +29,7 @@ const menuItems = [
     { path: '/', label: 'Dashboard', icon: <DashboardIcon /> },
     { path: '/integrations', label: 'Integrations', icon: <IntegrationIcon /> },
     { path: '/users', label: 'Users', icon: <UsersIcon /> },
-    { path: '/plans', label: 'Subscription Plans', icon: <PlansIcon /> },
+    { path: '/plans', label: 'Plans', icon: <PlansIcon /> },
     { path: '/ai-settings', label: 'AI Settings', icon: <AIIcon /> },
     { path: '/audit-log', label: 'Audit Log', icon: <AuditIcon /> },
     { path: '/settings', label: 'Settings', icon: <SettingsIcon /> },
@@ -55,9 +55,9 @@ export function Sidebar({ open, width }: SidebarProps) {
             }}
         >
             {/* Logo */}
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 2, pb: 1.5 }}>
                 <Typography
-                    variant="h5"
+                    variant="h6"
                     sx={{
                         fontWeight: 700,
                         background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
@@ -75,9 +75,11 @@ export function Sidebar({ open, width }: SidebarProps) {
             <Divider />
 
             {/* Navigation */}
-            <List sx={{ px: 2, py: 1 }}>
+            <List sx={{ px: 1.5, py: 1 }}>
                 {menuItems.map((item) => {
-                    const isActive = location.pathname === item.path;
+                    const isActive = item.path === '/'
+                        ? location.pathname === '/'
+                        : location.pathname.startsWith(item.path);
 
                     return (
                         <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
@@ -85,7 +87,9 @@ export function Sidebar({ open, width }: SidebarProps) {
                                 component={NavLink}
                                 to={item.path}
                                 sx={{
-                                    borderRadius: 2,
+                                    borderRadius: 1.5,
+                                    py: 1,
+                                    px: 1.5,
                                     backgroundColor: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                                     '&:hover': {
                                         backgroundColor: isActive
@@ -96,7 +100,7 @@ export function Sidebar({ open, width }: SidebarProps) {
                             >
                                 <ListItemIcon
                                     sx={{
-                                        minWidth: 40,
+                                        minWidth: 36,
                                         color: isActive ? 'primary.main' : 'text.secondary',
                                     }}
                                 >

@@ -5,10 +5,10 @@
  */
 
 import { Router } from 'express';
-import { authenticate, authorize } from '../middleware/auth';
-import { UserController } from '../controllers/userController';
-import { UserService } from '../services/userService';
-import { UserRepository } from '../repositories/userRepository';
+import { authenticate, requireAdmin } from '../middleware/auth.js';
+import { UserController } from '../controllers/userController.js';
+import { UserService } from '../services/userService.js';
+import { UserRepository } from '../repositories/userRepository.js';
 import { getPrismaClient } from '@unimobiliare/database';
 
 const router = Router();
@@ -19,8 +19,7 @@ const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
 // All routes require admin authentication
-router.use(authenticate);
-router.use(authorize('ADMIN'));
+router.use(authenticate, requireAdmin);
 
 /**
  * GET /api/v1/users

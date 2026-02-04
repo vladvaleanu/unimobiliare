@@ -123,7 +123,7 @@ export const listIntegrationsSchema = z.object({
         search: z.string().max(100).optional(),
         orderBy: z.enum(['name', 'createdAt', 'lastSyncAt']).optional(),
         orderDir: z.enum(['asc', 'desc']).optional(),
-    }),
+    }).passthrough(), // Allow additional query params
 });
 
 export const toggleEnabledSchema = z.object({

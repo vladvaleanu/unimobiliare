@@ -5,15 +5,35 @@ import { ValidationError } from '../errors/index.js';
 /**
  * Validation middleware factory
  * STRICT: All inputs validated with schema BEFORE reaching controller
+ * 
+ * Supports two schema styles:
+ * 1. Simple: z.object({ email: z.string(), ... }) - validates body only
+ * 2. Full: z.object({ body: z.object(...), query: z.object(...), params: z.object(...) })
  */
 export function validate<T extends ZodSchema>(schema: T) {
     return (req: Request, _res: Response, next: NextFunction): void => {
         try {
-            // Validate request body
-            const validated = schema.parse(req.body);
+            // Check if schema expects body/query/params structure
+            // by trying to parse full request first
+            let validated: any;
 
-            // Attach validated data to request
-            req.body = validated;
+            try {
+                // Try full request structure first
+                validated = schema.parse({
+                    body: req.body,
+                    query: req.query,
+                    params: req.params,
+                });
+
+                // Success - attach validated data back to request
+                if (validated.body !== undefined) req.body = validated.body;
+                if (validated.query !== undefined) req.query = validated.query;
+                if (validated.params !== undefined) req.params = validated.params as typeof req.params;
+            } catch (fullError) {
+                // Full structure failed, try body-only (legacy schemas)
+                validated = schema.parse(req.body);
+                req.body = validated;
+            }
 
             next();
         } catch (error) {

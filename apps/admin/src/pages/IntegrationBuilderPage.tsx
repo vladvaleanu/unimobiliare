@@ -5,7 +5,7 @@
  * 5-step wizard: Source → List Page → Fields → Transform → Test
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -15,6 +15,8 @@ import {
     Card,
     CardContent,
     Button,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
 import { ArrowBack as BackIcon } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -23,6 +25,7 @@ import { ListPageStep } from '../components/integration-builder/ListPageStep';
 import { FieldMappingStep } from '../components/integration-builder/FieldMappingStep';
 import { TransformStep } from '../components/integration-builder/TransformStep';
 import { TestStep } from '../components/integration-builder/TestStep';
+import { integrationsService } from '../services/integrationsService';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -128,6 +131,80 @@ export function IntegrationBuilderPage() {
     const [listPageConfig, setListPageConfig] = useState<ListPageConfig>(DEFAULT_LIST_PAGE_CONFIG);
     const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
     const [transforms, setTransforms] = useState<TransformConfig[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Fetch existing integration data when editing
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchIntegration = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await integrationsService.getById(id);
+                const integration = response.data;
+
+                // Populate source config
+                if (integration.sourceConfig) {
+                    const src = integration.sourceConfig as Record<string, unknown>;
+                    setSourceConfig({
+                        name: integration.name || '',
+                        displayName: integration.displayName || '',
+                        baseUrl: (src.baseUrl as string) || '',
+                        type: (src.type as 'html' | 'api') || 'html',
+                        authType: (src.authType as 'none' | 'basic' | 'bearer' | 'cookie') || 'none',
+                        authCredentials: (src.authCredentials as Record<string, string>) || {},
+                        rateLimit: (src.rateLimit as { requestsPerMinute: number; delayMs: number }) || {
+                            requestsPerMinute: 30,
+                            delayMs: 2000,
+                        },
+                        headers: (src.headers as Record<string, string>) || {},
+                    });
+                }
+
+                // Populate list page config
+                if (integration.listPageConfig) {
+                    const lp = integration.listPageConfig as Record<string, unknown>;
+                    setListPageConfig({
+                        listSelector: (lp.listSelector as string) || '',
+                        itemSelector: (lp.itemSelector as string) || '',
+                        detailLinkSelector: (lp.detailLinkSelector as string) || '',
+                        pagination: (lp.pagination as ListPageConfig['pagination']) || {
+                            type: 'page',
+                            paramName: 'page',
+                            startValue: 1,
+                            increment: 1,
+                            maxPages: 10,
+                        },
+                    });
+                }
+
+                // Populate field mappings
+                if (integration.fieldMappings && Array.isArray(integration.fieldMappings)) {
+                    setFieldMappings(integration.fieldMappings.map((fm) => {
+                        const mapping: FieldMapping = {
+                            field: (fm.field as string) || '',
+                            selector: (fm.selector as string) || '',
+                            selectorType: (fm.selectorType as 'css' | 'xpath') || 'css',
+                            transforms: (fm.transforms as TransformConfig[]) || [],
+                        };
+                        if (fm.attribute) {
+                            mapping.attribute = fm.attribute as string;
+                        }
+                        return mapping;
+                    }));
+                }
+            } catch (err) {
+                console.error('Failed to load integration:', err);
+                setError('Failed to load integration data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchIntegration();
+    }, [id]);
 
     const handleNext = () => {
         setActiveStep((prev) => Math.min(prev + 1, STEPS.length - 1));
@@ -209,9 +286,23 @@ export function IntegrationBuilderPage() {
                 </Typography>
             </Box>
 
+            {/* Loading State */}
+            {loading && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress />
+                </Box>
+            )}
+
+            {/* Error State */}
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
             {/* Stepper */}
             <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-                {STEPS.map((step, index) => (
+                {STEPS.map((step) => (
                     <Step key={step.label}>
                         <StepLabel
                             optional={
